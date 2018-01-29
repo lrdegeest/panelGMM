@@ -1,0 +1,2 @@
+load("/Users/LawrenceDeGeest/Desktop/notebook/research/software/panelGMM/data/hours_wages.RData")
+head(hours_wages)
