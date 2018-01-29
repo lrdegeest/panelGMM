@@ -19,7 +19,7 @@ install_github("lrdegeest/panelGMM")
 
 ## Demo
 
-Recreate the base-case two-step GMM-IV model in Table 22.2 of Cameron and Trivedi (2005). The authors estimate wages of a panel of 532 workers from 1981 - 1988. 
+Recreate the base-case two-step GMM-IV model in Table 22.2 of Cameron and Trivedi (2005). The authors estimate wages for a panel of 532 workers from 1981 - 1988. 
 
 ```R
 > #0. data
