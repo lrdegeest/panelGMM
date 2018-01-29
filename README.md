@@ -7,8 +7,8 @@ The function `panelGMM` estimates one-step and two-step GMM-IV linear models for
 The package also provides the following convenience functions to:
 
 * rename variables so that independent variables are prepended with "x_" and dependent variables are prepended with "y_" (`renameVars`);
-* create $n$-lagged variables in batches (`makeLAGS`);
-* and create $n$-differenced variables in batches (`makeDIFFS`).
+* create *n*-lagged variables in batches (`makeLAGS`);
+* and create *n*-differenced variables in batches (`makeDIFFS`).
 
 ## Installation
 
