@@ -65,8 +65,8 @@ panelGMM <- function (formula, instruments, time, nlags, twostep = FALSE, data) 
   mtZ <- delete.response(terms(formula, data = data, rhs = 2))
   Z <- model.matrix(mtZ, mf)
   t <- length(unique(mf$`(time)`)) + nlags
-  W <- solve(crossprod(Z,Z))
-  beta <- crossprod(solve(crossprod(X,Z) %*% W %*% crossprod(Z,X)),(crossprod(X,Z) %*% W %*% crossprod(Z,y)))
+  W <- solve(crossprod(Z))
+  beta <- crossprod(solve(crossprod(X,Z) %*% (W %*% crossprod(Z,X))), (crossprod(X,Z) %*% (W %*% crossprod(Z,y))))
   cs <- seq(1, (nrow(data)/t), 1)
   cst = rep(cs, each = (nrow(na.omit(data))/length(cs)))
   r <- ncol(Z)
@@ -74,28 +74,28 @@ panelGMM <- function (formula, instruments, time, nlags, twostep = FALSE, data) 
   prediction <- X %*% beta
   e <- y - prediction
   getS <- function(instruments, residuals) {
-    ZuuZ <- lapply(cs, function(i) t(Z[cst == i, ]) %*% e[cst == i] %*% t(e[cst == i]) %*% Z[cst == i, ])
+    ZuuZ <- lapply(cs, function(i) crossprod(Z[cst == i, ],e[cst == i]) %*% crossprod(e[cst == i], Z[cst == i, ]))
     S <- matrix(apply(matrix(unlist(ZuuZ), ncol = r * r, byrow = T),
                       MAR = 2, FUN = sum), ncol = r, byrow = T)
     return(S)
   }
   S <- getS(Z,e)
-  XZWZX <- crossprod(X,Z) %*% W %*% crossprod(Z,X)
-  XZWSWZX <- crossprod(X,Z) %*% W %*% S %*% t(W) %*% crossprod(Z,X)
-  var <- solve(XZWZX) %*% XZWSWZX %*% solve(XZWZX)
+  XZWZX <- crossprod(X,Z) %*% (W %*% crossprod(Z,X))
+  XZWSWZX <- (crossprod(X,Z) %*% W) %*% (tcrossprod(S,t(W)) %*% crossprod(Z,X))
+  var <- solve(XZWZX) %*% (XZWSWZX %*% solve(XZWZX))
   se <- sqrt(diag(var))
   if(twostep){
     beta <- crossprod(solve(crossprod(X,Z) %*% solve(S) %*% crossprod(Z,X)),(crossprod(X,Z) %*% solve(S) %*% crossprod(Z,y)))
     prediction <- X %*% beta
     e <- y - prediction
     S2 <- getS(Z,e)
-    var <- solve(crossprod(X,Z) %*% (solve(S2)) %*% crossprod(Z,X))
+    var <- solve(crossprod(X,Z) %*% ((solve(S2)) %*% crossprod(Z,X)))
     se <- sqrt(diag(var))
-    Zu <- lapply(cs, function(i) t(Z[cst == i, ]) %*% e[cst == i])
-    uZ <- lapply(cs, function(i) t(e[cst == i]) %*% Z[cst == i, ])
+    Zu <- lapply(cs, function(i) crossprod(Z[cst == i, ], e[cst == i]))
+    uZ <- lapply(cs, function(i) crossprod(e[cst == i], Z[cst == i, ]))
     Zu_mat <- matrix(apply(matrix(unlist(Zu), ncol = 1 * r, byrow = T), MAR = 2, FUN = sum), ncol = r, byrow = T)
     uZ_mat <- matrix(apply(matrix(unlist(Zu), ncol = r * 1, byrow = T), MAR = 2, FUN = sum), ncol = 1, byrow = T)
-    OIR <- Zu_mat %*% solve(S2) %*% uZ_mat
+    OIR <- Zu_mat %*% tcrossprod(solve(S2),Zu_mat)
     OIR.pvalue <- pchisq(OIR, df = r - K, lower.tail = FALSE)
   }
   output <- list()
