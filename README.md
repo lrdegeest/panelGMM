@@ -6,9 +6,13 @@ The function `panelGMM` estimates one-step and two-step GMM-IV linear models for
 
 The package also provides the following convenience functions to:
 
-* rename variables so that independent variables are prepended with "x_" and dependent variables are prepended with "y_" (`renameVars`);
+* rename variables so that independent variables are prepended with "x_" and dependent variables are prepended with "y_" (`renameVars`), making it more convenient to lag and difference batches of variables;
 * create *n*-lagged variables in batches (`makeLAGS`);
 * and create *n*-differenced variables in batches (`makeDIFFS`).
+
+## Algorithm
+
+![](2GMM.png)
 
 ## Installation
 
@@ -16,7 +20,6 @@ The package also provides the following convenience functions to:
 library("devtools")
 install_github("lrdegeest/panelGMM")
 ```
-
 ## Demo
 
 Recreate the base-case two-step GMM-IV model in Table 22.2 of Cameron and Trivedi (2005). The authors estimate wages for a panel of 532 workers from 1981 - 1988. 
