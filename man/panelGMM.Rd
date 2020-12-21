@@ -4,58 +4,44 @@
 \alias{panelGMM}
 \title{Generalized Method of Moments (GMM) for panel data}
 \usage{
-panelGMM(formula, instruments, time, nlags, twostep = FALSE, data)
+panelGMM(formula, panel, time, twostep = TRUE, intercept = FALSE, data)
 }
 \arguments{
-\item{formula}{specification of the regression relationship}
+\item{formula}{the model in standard R form with instruments (e.g., \code{y ~ x1 + x2 | z1 + z2 ...}).}
 
-\item{instruments}{set of variables to instrument for the independent variables}
+\item{panel}{the name of the panel variable in the data.}
 
-\item{time}{the name of the time series variable in the provided data}
+\item{time}{the name of the time variable in the data.}
 
-\item{nlags}{the highest number of lags in the instruments}
+\item{twostep}{estimate a two-step GMM model. Defaults to TRUE.}
 
-\item{twostep}{estimate a two-step GMM model. Defaults to FALSE.}
+\item{intercept}{optional intercept. Defaults to FALSE.}
 
-\item{data}{data of class data.frame}
+\item{data}{data of class \code{data.frame}/\code{tibble}/\code{data.table}.}
 }
 \value{
-model object of generic class "list" containing the following elements:
-\item{\code{coefficients}}{the estimated coefficients}
-\item{\code{fitted.values}}{predicted values of the dependent variable}
-\item{\code{residuals}}{the residuals}
-\item{\code{standard.errors}}{the panel-robust standard errors for the estimated coefficients}
-\item{\code{RMSE}}{the root mean squared error}
-\item{\code{pvalues}}{the p-values for the estimated coefficients}
-\item{\code{y}}{a vector of the model's dependent variable}
-\item{\code{x}}{the model's independent variables and matrices, each in their own matrix}
-\item{\code{results}}{a \code{data.frame} of the results: coefficients, standard errors and p-values}
-\item{\code{call}}{the model call}
-\item{\code{formula}}{the model formula}
-\item{\code{terms}}{a list with elements "regressors" and "instruments" containing the terms objects for the respective components}
-\item{\code{levels}}{levels of the categorical regressors}
-\item{\code{summary}}{a list object summarizing the model: the model call, the results (\code{results}), the RMSE, and if \code{twostep = TRUE}, the OIR test statistic and p-value.}
+a \code{panelGMM} object.
 }
 \description{
-Fit one-step and two-step GMM models for panel data with lagged instrumental variables. Provides panel-robust standard errors allowing for heteroskedasticity and correlation over time.
+Fit one-step and two-step GMM models for panel data with lagged instrumental variables. Calculates panel-robust standard errors allowing for heteroskedasticity and correlation over time.
+Includes \code{summary.panelGMM} and \code{print.summary.panelGMM} methods.
+}
+\note{
+Currently works only for balanced panels.
 }
 \examples{
-# Load the "hours and wages" data provided by the panelGMM package:
+# Using the hours and wages data provided by the panelGMM package:
 data("hours_wages", package = "panelGMM")
-# Generate differenced and lagged variables:
-hours_wages_gmm <- renameVars(hours_wages, "lnhr", c("lnwg", "kids", "age", "agesq", "disab"))
-hours_wages_gmm <- makeDIFFS(hours_wages_gmm, id, 1)
-hours_wages_gmm <- makeLAGS(hours_wages_gmm, id, 1, y = FALSE)
-hours_wages_gmm <- makeLAGS(hours_wages_gmm, id, 2, y = FALSE)
-# Estimate
-model <- d1_y_lnhr ~ 0 + d1_x_lnwg + d1_x_kids + d1_x_age + d1_x_agesq + d1_x_disab | 0 + l1_x_kids + l1_x_age + l1_x_agesq + l1_x_disab + l2_x_kids + l2_x_age + l2_x_agesq + l2_x_disab + l2_x_lnwg
-estimation <- panelGMM(model, time = year, nlags = 2, twostep = T, data = hours_wages_gmm)
-# View results:
-model$summary
-}
-\references{
-Cameron, A. Colin, and Pravin K. Trivedi. Microeconometrics: methods and applications. Cambridge university press, 2005.
+# create lagged and differenced instruments
+hours_wages_gmm = hours_wages \%>\%
+   shiftCols(data = ., panel=id, type = "difference", shifts = 1, columns=c("lnhr", "lnwg", "kids", "age", "agesq", "disab")) \%>\%
+   shiftCols(data = ., panel=id, type = "lag", shifts = 1:4, columns=c("lnhr", "lnwg", "kids", "age", "agesq", "disab"))
+# define the model
+model = lnhr_diff_1 ~ lnwg_diff_1 + kids_diff_1 + age_diff_1 + agesq_diff_1 + disab_diff_1 | kids_lag_1 + kids_lag_2 + age_lag_1 + age_lag_2 + agesq_lag_1 + agesq_lag_2 + disab_lag_1 + disab_lag_2 + lnwg_lag_2
+# estimate the parameters with two-step GMM
+model_results = panelGMM(model, panel = id, time = year, twostep = TRUE, data = hours_wages_gmm)
+summary(model_results)
 }
 \author{
-Lawrence R De Geest, \email{lrdegeest@gmail.com}
+Lawrence R. De Geest, \email{lrdegeest@gmail.com}
 }
