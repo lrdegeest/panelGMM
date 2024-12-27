@@ -105,7 +105,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
   ## calculate ZuuZ for each panel and return a list
   ZuuZ_list <- do_ZuuZ(Z, e, cs, t)
   ## collapse the list of clusters into a weighting matrix
-  S <- matrix(apply(matrix(unlist(ZuuZ_list), ncol = r * r, byrow = T), MAR = 2, FUN = sum), ncol = r, byrow = T)
+  S <- matrix(apply(matrix(unlist(ZuuZ_list), ncol = r * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
 
   # variance-covariance matrix for one-step GMM
   if(!twostep){
@@ -135,7 +135,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
     ## re-calculate ZuuZ for each panel and return a list
     ZuuZ2 <- do_ZuuZ(Z, e, cs, t)
     ## collapse the list of clusters into a new weighting matrix
-    S2 <- matrix(apply(matrix(unlist(ZuuZ2), ncol = r * r, byrow = T),MAR = 2, FUN = sum), ncol = r, byrow = T)
+    S2 <- matrix(apply(matrix(unlist(ZuuZ2), ncol = r * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
     ## use the new weighting matrix to re-calculate the variance-covariance matrix
     vcov <- solve(crossprod(X,Z) %*% (solve(S2) %*% crossprod(Z,X)))
 
@@ -145,7 +145,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
     ## first calculate Zu' for each panel and return
     Zu_list <- do_Zu(Z, e, cs, t)
     ## now collapse the list
-    Zu_mat <- matrix(apply(matrix(unlist(Zu_list), ncol = 1 * r, byrow = T), MAR = 2, FUN = sum), ncol = r, byrow = T)
+    Zu_mat <- matrix(apply(matrix(unlist(Zu_list), ncol = 1 * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
     ## calculate the test statistic...
     OIR <- Zu_mat %*% tcrossprod(solve(S2),Zu_mat)
     ## ...and it's p-value
