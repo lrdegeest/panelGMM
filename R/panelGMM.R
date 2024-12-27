@@ -215,7 +215,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
 
 }
 
-
+#' @export
 print.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), ...){
 
   x <- object
@@ -235,6 +235,7 @@ print.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), .
 
 }
 
+#' @export
 summary.panelGMM <- function(object, ...){
 
   x <- object
@@ -272,7 +273,7 @@ summary.panelGMM <- function(object, ...){
 
 }
 
-
+#' @export
 print.summary.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), ...) {
 
   x <- object
