@@ -95,7 +95,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
   # calculate weighting matrix W = (Z'Z)^-1
   W <- solve(crossprod(Z))
   # estimate the coefficients
-  ## [X'ZWZ'X]^1 X'ZWZ'y
+  ## [X'ZWZ'X]^(-1) X'ZWZ'y
   beta <- crossprod(solve(crossprod(X,Z) %*% (W %*% crossprod(Z,X))), (crossprod(X,Z) %*% (W %*% crossprod(Z,y))))
   # get the predicted values
   prediction <- do_mv(X,beta)
@@ -294,11 +294,11 @@ print.summary.panelGMM <- function(object, digits = max(3L, getOption("digits") 
   # print the coefficient matrix
   cat("\n\n-------------------------------------------------------------------\n")
   cat("COEFFICIENTS\n")
-
+  l <- length(x$coefficients)
   res <- matrix(NA,
-                nrow = length(x$coefficients),
+                nrow = l,
                 ncol = 4,
-                dimnames = list(c(1:5), c("Estimate","Std.Error","z-value", "Pr(>|z|)")))
+                dimnames = list(seq_len(l), c("Estimate","Std.Error","z-value", "Pr(>|z|)")))
 
   res[,1] <- x$coefficients
   res[,2] <- x$standard_errors
