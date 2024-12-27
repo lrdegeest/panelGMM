@@ -58,8 +58,8 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
 
   # drop the intercept unless user asks for it
   if(!intercept) {
-    X <- X[,-1]
-    Z <- Z[,-1]
+    X <- X[ , -1, drop = FALSE]
+    Z <- Z[ , -1, drop = FALSE]
   }
 
   # get the instrument names, use these in summary()
