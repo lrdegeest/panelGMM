@@ -5,10 +5,14 @@ Version: 2.0
 Date: 2020-12-21
 Author: Lawrence R. De Geest
 Maintainer: Lawrence R. De Geest <lrdegeest@gmail.com>
-Description: General Method of Moments (GMM) estimators for panel data with lagged and 		differenced instruments in R. The function panelGMM estimates one-step and two-		step GMM-IV linear models for panel data. Panel-robust standard errors allowing 	for heteroskedasticity and correlation over time are calculated using the 		algorithm laid out in Chapter 22 of Cameron and Trivedi (2005).
+Description: General Method of Moments (GMM) estimators for panel data with 
+lagged and differenced instruments in R. The function panelGMM estimates 
+one-step and two-step GMM-IV linear models for panel data. Panel-robust 
+standard errors allowing for heteroskedasticity and correlation over time are 
+calculated using the algorithm laid out in Chapter 22 of 
+Cameron and Trivedi (2005).
 License: MIT + file LICENSE
 Imports: 
-  Rcpp (>= 1.0.3),
-  data.table
+  Rcpp (>= 1.0.3), data.table, Formula
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
