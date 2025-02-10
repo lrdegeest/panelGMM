@@ -2,3 +2,7 @@ useDynLib(panelGMM, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 import(data.table)
 exportPattern("^[[:alpha:]]+")
+
+S3method(summary,panelGMM)
+S3method(print,summary.panelGMM)
+S3method(print,panelGMM)

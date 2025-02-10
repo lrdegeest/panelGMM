@@ -58,8 +58,8 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
 
   # drop the intercept unless user asks for it
   if(!intercept) {
-    X <- X[,-1]
-    Z <- Z[,-1]
+    X <- X[ , -1, drop = FALSE]
+    Z <- Z[ , -1, drop = FALSE]
   }
 
   # get the instrument names, use these in summary()
@@ -95,7 +95,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
   # calculate weighting matrix W = (Z'Z)^-1
   W <- solve(crossprod(Z))
   # estimate the coefficients
-  ## [X'ZWZ'X]^1 X'ZWZ'y
+  ## [X'ZWZ'X]^(-1) X'ZWZ'y
   beta <- crossprod(solve(crossprod(X,Z) %*% (W %*% crossprod(Z,X))), (crossprod(X,Z) %*% (W %*% crossprod(Z,y))))
   # get the predicted values
   prediction <- do_mv(X,beta)
@@ -105,7 +105,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
   ## calculate ZuuZ for each panel and return a list
   ZuuZ_list <- do_ZuuZ(Z, e, cs, t)
   ## collapse the list of clusters into a weighting matrix
-  S <- matrix(apply(matrix(unlist(ZuuZ_list), ncol = r * r, byrow = T), MAR = 2, FUN = sum), ncol = r, byrow = T)
+  S <- matrix(apply(matrix(unlist(ZuuZ_list), ncol = r * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
 
   # variance-covariance matrix for one-step GMM
   if(!twostep){
@@ -135,7 +135,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
     ## re-calculate ZuuZ for each panel and return a list
     ZuuZ2 <- do_ZuuZ(Z, e, cs, t)
     ## collapse the list of clusters into a new weighting matrix
-    S2 <- matrix(apply(matrix(unlist(ZuuZ2), ncol = r * r, byrow = T),MAR = 2, FUN = sum), ncol = r, byrow = T)
+    S2 <- matrix(apply(matrix(unlist(ZuuZ2), ncol = r * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
     ## use the new weighting matrix to re-calculate the variance-covariance matrix
     vcov <- solve(crossprod(X,Z) %*% (solve(S2) %*% crossprod(Z,X)))
 
@@ -145,7 +145,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
     ## first calculate Zu' for each panel and return
     Zu_list <- do_Zu(Z, e, cs, t)
     ## now collapse the list
-    Zu_mat <- matrix(apply(matrix(unlist(Zu_list), ncol = 1 * r, byrow = T), MAR = 2, FUN = sum), ncol = r, byrow = T)
+    Zu_mat <- matrix(apply(matrix(unlist(Zu_list), ncol = 1 * r, byrow = T), MARGIN = 2, FUN = sum), ncol = r, byrow = T)
     ## calculate the test statistic...
     OIR <- Zu_mat %*% tcrossprod(solve(S2),Zu_mat)
     ## ...and it's p-value
@@ -215,7 +215,7 @@ panelGMM <- function(formula, panel, time, twostep = TRUE, intercept = FALSE, da
 
 }
 
-
+#' @export
 print.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), ...){
 
   x <- object
@@ -235,6 +235,7 @@ print.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), .
 
 }
 
+#' @export
 summary.panelGMM <- function(object, ...){
 
   x <- object
@@ -272,7 +273,7 @@ summary.panelGMM <- function(object, ...){
 
 }
 
-
+#' @export
 print.summary.panelGMM <- function(object, digits = max(3L, getOption("digits") - 3L), ...) {
 
   x <- object
@@ -293,11 +294,11 @@ print.summary.panelGMM <- function(object, digits = max(3L, getOption("digits") 
   # print the coefficient matrix
   cat("\n\n-------------------------------------------------------------------\n")
   cat("COEFFICIENTS\n")
-
+  l <- length(x$coefficients)
   res <- matrix(NA,
-                nrow = length(x$coefficients),
+                nrow = l,
                 ncol = 4,
-                dimnames = list(c(1:5), c("Estimate","Std.Error","z-value", "Pr(>|z|)")))
+                dimnames = list(seq_len(l), c("Estimate","Std.Error","z-value", "Pr(>|z|)")))
 
   res[,1] <- x$coefficients
   res[,2] <- x$standard_errors
